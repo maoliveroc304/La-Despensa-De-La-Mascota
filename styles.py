@@ -1,138 +1,97 @@
 def get_css():
     return """
     <style>
-        /* IMPORTAR FUENTES */
         @import url('https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap');
         
         /* --- RESET Y BASE --- */
         html, body, [class*="css"] {
             font-family: 'Spline Sans', sans-serif;
-            background-color: #F8F6F6; /* Color de fondo general */
+            background-color: #F8F6F6;
             color: #181111;
         }
 
-        /* Ocultar elementos nativos molestos */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;} 
+        /* Ocultar elementos nativos */
+        #MainMenu, footer, header {visibility: hidden;}
+        
+        /* Eliminar padding superior para que el header pegue al borde */
         .block-container {
             padding-top: 0rem !important;
             padding-bottom: 5rem !important;
-            padding-left: 0rem !important;
-            padding-right: 0rem !important;
-            max-width: 100% !important;
+            margin-top: 0 !important;
         }
 
-        /* --- HEADER (NAVBAR) --- */
-        .nav-container {
-            background-color: #001f3f;
-            padding: 15px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
+        /* --- FONDO DEL HEADER (VISUAL) --- */
+        /* Creamos una barra azul fija detrás de los controles de Streamlit */
+        .header-background {
+            position: fixed;
             top: 0;
-            z-index: 9999;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            color: white;
-            margin-bottom: 20px;
+            left: 0;
+            width: 100vw;
+            height: 80px; /* Ajusta la altura del header */
+            background-color: #001f3f;
+            z-index: 50; /* Detrás de los widgets, pero encima del contenido */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
-        /* --- TARJETAS (LOGIN, REGISTRO, RESUMEN) --- */
+        /* --- POSICIONAMIENTO DE LOS WIDGETS DEL HEADER --- */
+        /* Esto empuja los widgets de Streamlit hacia abajo para que no queden tapados,
+           excepto los que queremos EN el header */
+        
+        /* Estilo específico para el LOGO (Botón transparente) */
+        div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
+            background-color: transparent !important;
+            border: none !important;
+            color: white !important;
+            text-align: left !important;
+            font-size: 20px !important;
+            padding: 0 !important;
+        }
+        div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
+            color: #FF4500 !important; /* Naranja al pasar el mouse */
+        }
+
+        /* Estilo específico para la BARRA DE BÚSQUEDA en el header */
+        /* Buscamos el input dentro de las columnas superiores */
+        div[data-testid="stHorizontalBlock"] .stTextInput input {
+            border-radius: 20px !important;
+            border: none !important;
+            padding: 10px 20px !important;
+            background-color: white !important;
+            color: #333 !important;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1) !important;
+        }
+        
+        /* Estilos para los botones de la derecha (Mi Cuenta / Carrito) */
+        /* Usaremos una clase custom o identificaremos por el texto si es posible, 
+           pero por ahora forzamos los botones en el bloque horizontal superior */
+           
+        /* Ajuste de alineación vertical para que todo quede centrado en la barra azul */
+        div[data-testid="stVerticalBlock"] > div:first-child {
+            z-index: 100; /* Asegura que los botones estén clickeables sobre la barra azul */
+            padding-top: 15px; /* Baja un poco los controles para centrarlos en la barra de 80px */
+        }
+
+        /* --- ESTILOS GENERALES (Resto de la app) --- */
         .custom-card {
             background-color: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border: 1px solid #E5E7EB;
         }
-
-        /* --- INPUTS --- */
-        /* Forzamos el estilo de los inputs de Streamlit */
-        .stTextInput > div > div > input {
-            border-radius: 12px;
-            padding: 12px 15px;
-            border: 1px solid #E5E7EB;
-            background-color: #F9FAFB;
-            color: #111827;
-        }
-        .stTextInput > div > div > input:focus {
-            border-color: #FF4500;
-            box-shadow: 0 0 0 2px rgba(255, 69, 0, 0.2);
-        }
-
-        /* --- BOTONES --- */
-        /* Botón Primario (Naranja) */
-        div.stButton > button {
-            background-color: #FF4500;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 24px;
-            font-weight: 700;
-            transition: all 0.2s;
-            width: 100%;
-        }
-        div.stButton > button:hover {
-            background-color: #CC3700;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
-        }
         
-        /* Botón Secundario (Borde, para "Eliminar" o "Volver") */
-        div.stButton > button.secondary-btn {
-            background-color: transparent;
-            border: 2px solid #E5E7EB;
-            color: #374151;
+        /* Botones Naranjas (Acción Principal) */
+        button[kind="primary"] {
+            background-color: #FF4500 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 12px !important;
+            transition: transform 0.1s !important;
         }
-        
-        /* Botones Pequeños (+ / -) */
-        .small-btn > button {
-            padding: 5px 10px !important;
-            background-color: #F3F4F6 !important;
-            color: #1F2937 !important;
-            border-radius: 8px !important;
+        button[kind="primary"]:hover {
+            background-color: #CC3700 !important;
+            transform: scale(1.02) !important;
         }
 
-        /* --- PRODUCTOS --- */
-        .product-grid-item {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid #F3F4F6;
-            transition: transform 0.2s;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        .product-grid-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-        }
-        .product-img {
-            width: 100%;
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-        }
-        
-        /* --- CARRITO & CHECKOUT --- */
-        .cart-item {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #F3F4F6;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-        
-        /* Utility */
-        .text-primary { color: #FF4500; }
-        .text-navy { color: #001f3f; }
-        .font-bold { font-weight: 700; }
-        
     </style>
     """
