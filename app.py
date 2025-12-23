@@ -1,100 +1,94 @@
 import streamlit as st
 from styles import get_css
+# Asumimos que tienes estas carpetas y archivos creados como en la iteración anterior
 from state import init_state, get_cart_count, get_cart_total, navigate_to
-# Importar vistas
 from views.home import render_home
 from views.cart import render_cart
 from views.checkout import render_checkout
 from views.auth import render_login, render_register
 
-# --- CONFIGURACIÓN ---
+# --- CONFIGURACIÓN INICIAL ---
 st.set_page_config(layout="wide", page_title="La Despensa de la Mascota", page_icon="🐾")
-init_state()
+init_state() # Inicializa variables de sesión
 
-# Inyectamos CSS
+# Inyectar estilos CSS
 st.markdown(get_css(), unsafe_allow_html=True)
 
-# ==========================================
-# HEADER ADAPTADO DE STITCH
-# ==========================================
+# ==============================================================================
+# HEADER HÍBRIDO: APARIENCIA DE HTML + FUNCIONALIDAD DE PYTHON
+# ==============================================================================
 
-# 1. Fondo Azul Fijo (Visual)
+# 1. El Fondo Azul (Pura decoración visual, posición fija)
 st.markdown('<div class="header-bg"></div>', unsafe_allow_html=True)
 
-# 2. Contenedor Interactivo (Sobre el fondo)
-# Usamos un container para agrupar y columnas para distribuir
-header_container = st.container()
+# 2. El Contenido Funcional (Widgets de Streamlit superpuestos)
+# Usamos un contenedor para centrar el contenido (max-w-1280px equivalente)
+with st.container():
+    # Creamos columnas con proporciones ajustadas al diseño HTML
+    # [Logo 20%] [Buscador 40%] [Acciones 40%]
+    c_logo, c_search, c_actions = st.columns([2, 4, 3])
 
-with header_container:
-    # Definimos columnas: Logo (Izquierda), Buscador (Centro), Acciones (Derecha)
-    # Ratios ajustados para parecerse a tu imagen: [2, 3, 2]
-    col1, col2, col3 = st.columns([2, 3, 2], gap="medium")
-
-    # --- COLUMNA 1: LOGO ---
-    with col1:
-        # Envolvemos el botón en un div para aplicar el CSS .logo-btn
-        st.markdown('<div class="logo-btn">', unsafe_allow_html=True)
-        # El botón actúa como el texto clickeable "La Despensa..."
-        if st.button("🐾 La Despensa de la Mascota", key="logo_home"):
+    # --- LOGO (Izquierda) ---
+    with c_logo:
+        st.markdown('<div class="logo-btn" style="display:flex; align-items:center; gap:10px;">', unsafe_allow_html=True)
+        # Icono visual (HTML)
+        st.markdown("""
+            <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center; float:left; margin-right:10px;">
+                <span style="font-size:20px;">🐾</span>
+            </div>
+        """, unsafe_allow_html=True)
+        # Botón funcional invisible encima del texto
+        if st.button("La Despensa\nde la Mascota", key="logo_home_btn"):
             navigate_to('home')
         st.markdown('</div>', unsafe_allow_html=True)
-        # Subtítulo (visual, no clickeable)
-        st.markdown('<div class="logo-subtext">por Tienda Buendía</div>', unsafe_allow_html=True)
 
-    # --- COLUMNA 2: BUSCADOR ---
-    with col2:
-        # Envolvemos en .search-container para hacerlo redondo y blanco
-        st.markdown('<div class="search-container">', unsafe_allow_html=True)
-        # Usamos label_visibility="collapsed" para ocultar la etiqueta
-        search_query = st.text_input("search", placeholder="🔍 Buscar croquetas, juguetes...", label_visibility="collapsed")
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # (Opcional) Lógica de búsqueda
-        if search_query:
-            # Aquí podrías filtrar productos
-            pass
+    # --- BUSCADOR (Centro) ---
+    with c_search:
+        # El CSS se encarga de hacerlo redondo y ponerle la lupa
+        st.text_input("search", placeholder="Buscar croquetas, juguetes...", label_visibility="collapsed")
 
-    # --- COLUMNA 3: ACCIONES (Cuenta y Carrito) ---
-    with col3:
-        # Sub-columnas para alinear los botones a la derecha
-        # Usamos columnas vacías a la izquierda para empujar
-        c_spacer, c_acc, c_cart = st.columns([0.5, 1, 1.2])
+    # --- ACCIONES (Derecha) ---
+    with c_actions:
+        # Sub-columnas para alinear a la derecha
+        cc1, cc2, cc3 = st.columns([1, 1.5, 2])
         
-        with c_acc:
-            st.markdown('<div class="action-btn">', unsafe_allow_html=True)
-            # Icono de persona simulado con texto o emoji
-            user_label = "👤 Mi Cuenta"
+        with cc2: # Botón Usuario
+            st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
+            label_user = "👤 Mi Cuenta"
             if st.session_state.get('user_logged_in'):
-                user_label = "👤 Perfil"
-                
-            if st.button(user_label, key="btn_account_header"):
+                label_user = "👤 Perfil"
+            
+            if st.button(label_user, key="header_user"):
                 if not st.session_state.get('user_logged_in'):
                     navigate_to('login')
             st.markdown('</div>', unsafe_allow_html=True)
 
-        with c_cart:
-            # Calculamos totales
+        with cc3: # Botón Carrito
             count = get_cart_count()
             total = get_cart_total()
             
-            # Badge visual (HTML puro superpuesto)
+            # Badge rojo visual
             if count > 0:
-                st.markdown(f'<div class="cart-badge">{count}</div>', unsafe_allow_html=True)
-            
-            st.markdown('<div class="action-btn">', unsafe_allow_html=True)
-            # Botón del carrito
-            cart_label = f"🛒 S/. {total:.2f}"
-            if st.button(cart_label, key="btn_cart_header"):
+                # Usamos posición relativa para que el badge flote sobre el botón
+                st.markdown(f"""
+                <div style="position:relative; width: fit-content; margin: 0 auto;">
+                    <div class="cart-badge">{count}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
+            # El botón muestra el total, tal cual el diseño
+            label_cart = f"🛒 S/. {total:.2f}"
+            if st.button(label_cart, key="header_cart"):
                 navigate_to('cart')
             st.markdown('</div>', unsafe_allow_html=True)
 
-# Espaciador para que el contenido de la página no quede oculto tras el header fijo
-st.markdown('<div style="height: 80px;"></div>', unsafe_allow_html=True)
+# Espaciador invisible para empujar el contenido hacia abajo (ya que el header es fijo)
+st.markdown('<div style="margin-bottom: 90px;"></div>', unsafe_allow_html=True)
 
-# ==========================================
-# CONTENIDO DE LA PÁGINA
-# ==========================================
-
+# ==============================================================================
+# CONTENIDO DE LA PÁGINA (Router)
+# ==============================================================================
 page = st.session_state.page
 
 if page == 'home':
@@ -108,10 +102,25 @@ elif page == 'login':
 elif page == 'register':
     render_register()
 elif page == 'confirmation':
-    from views.checkout import render_confirmation # Asegúrate de tener esto en views/checkout.py
-    render_confirmation()
+    # Si aún no tienes confirmation.py, puedes poner el contenido aquí directo
+    st.balloons()
+    st.markdown("""
+    <div style="text-align:center; padding: 50px;">
+        <h1 style="color:#001f3f;">¡Pedido Registrado! 🎉</h1>
+        <p>Gracias por tu compra.</p>
+        <button style="background-color:#25D366; color:white; padding:10px 20px; border-radius:20px; border:none; margin-top:20px;">
+            Enviar constancia al WhatsApp
+        </button>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("Volver al Inicio"):
+        navigate_to('home')
 
-# ==========================================
+# ==============================================================================
 # FOOTER
-# ==========================================
-# (Aquí puedes adaptar el footer de Stitch usando st.markdown con HTML puro si lo deseas estático)
+# ==============================================================================
+st.markdown("""
+<div style="background-color:#001f3f; color:white; padding:40px; margin-top:50px; text-align:center; font-size:14px;">
+    <p style="opacity:0.7;">© 2024 Tienda Buendía. Todos los derechos reservados.</p>
+</div>
+""", unsafe_allow_html=True)
