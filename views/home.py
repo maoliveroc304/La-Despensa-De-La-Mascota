@@ -1,72 +1,54 @@
 import streamlit as st
 from assets import CATEGORIES, PRODUCTS
-from state import add_to_cart, navigate_to
+from state import add_to_cart
 
 def render_home():
-    # --- HERO SECTION ---
+    # Hero Section Simplificado
     st.markdown("""
-        <div class="hero-section">
-            <span style="background-color: #FF4500; width: fit-content; padding: 4px 12px; border-radius: 99px; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 1rem;">Solo lo mejor</span>
-            <h1 style="font-size: 3rem; font-weight: 900; line-height: 1.1; margin-bottom: 1rem;">Todo para tu engreído,<br><span style="color: #FF4500">precios de barrio.</span></h1>
-            <p style="font-size: 1.2rem; max-width: 500px; opacity: 0.9;">Encuentra alimentos premium, accesorios y más. Delivery rápido a todo San Juan de Lurigancho.</p>
-        </div>
+    <div style="background-image: linear-gradient(rgba(0,31,63,0.5), rgba(0,31,63,0.8)), url('https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1000&q=80'); 
+                background-size: cover; background-position: center; border-radius: 20px; padding: 60px 40px; color: white; margin: 20px 40px;">
+        <span style="background: #FF4500; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 12px;">NUEVO</span>
+        <h1 style="font-size: 48px; font-weight: 800; line-height: 1.1; margin-top: 10px;">Todo para tu mascota<br>a precios de barrio.</h1>
+    </div>
     """, unsafe_allow_html=True)
 
-    # --- CATEGORÍAS ---
-    st.markdown("<h3 style='color:#001f3f; font-weight:bold; margin: 2rem 0 1rem 0; padding-left: 1rem;'>Categorías Populares</h3>", unsafe_allow_html=True)
-    cols = st.columns(4)
-    for idx, cat in enumerate(CATEGORIES):
-        with cols[idx]:
-            st.markdown(f"""
-            <div class="category-card">
-                <div style="width: 80px; height: 80px; background-image: url('{cat['image']}'); background-size: cover; border-radius: 50%; margin: 0 auto 10px auto;"></div>
-                <div style="font-weight: bold; color: #333;">{cat['name']}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-    # --- PRODUCTOS DESTACADOS ---
-    st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
-    col_head1, col_head2 = st.columns([3, 1])
-    with col_head1:
-        st.markdown("<h3 style='color:#001f3f; font-weight:bold; padding-left: 1rem;'>Productos Destacados</h3>", unsafe_allow_html=True)
-    
     # Grid de Productos
-    # Usamos st.columns dentro de un loop para simular el grid
+    st.markdown("<h2 class='text-navy' style='margin: 30px 40px;'>Productos Destacados</h2>", unsafe_allow_html=True)
     
-    # Creamos filas de 4 productos
-    rows = [PRODUCTS[i:i + 4] for i in range(0, len(PRODUCTS), 4)]
+    # Truco: CSS Grid nativo dentro de markdown para el layout, pero botones de Streamlit
+    # Streamlit no deja meter botones dentro de HTML puro. 
+    # Así que usamos st.columns, pero envolvemos el contenido en divs con estilo .product-grid-item
     
-    for row in rows:
-        cols = st.columns(4)
-        for idx, product in enumerate(row):
+    # Iteramos de 4 en 4
+    for i in range(0, len(PRODUCTS), 4):
+        cols = st.columns(4, gap="medium")
+        batch = PRODUCTS[i:i+4]
+        
+        for idx, product in enumerate(batch):
             with cols[idx]:
-                # Contenedor visual del producto
-                # Nota: Streamlit separa UI de lógica. Renderizamos HTML para la imagen y precio,
-                # pero usamos un botón nativo de Streamlit para la acción "Agregar".
-                
-                # HTML Parte Superior
-                badge_html = f'<div class="badge">{product["badge"]}</div>' if "badge" in product else ""
-                orig_price_html = f'<span style="text-decoration: line-through; color: gray; font-size: 0.8rem;">S/. {product["originalPrice"]:.2f}</span>' if product.get("originalPrice") else ""
-                
+                # 1. Parte Visual (HTML)
                 st.markdown(f"""
-                <div class="product-card">
-                    <div style="position: relative; height: 200px; overflow: hidden;">
-                        {badge_html}
-                        <div style="width: 100%; height: 100%; background-image: url('{product['image']}'); background-size: cover; background-position: center;"></div>
+                <div class="product-grid-item">
+                    <div class="product-img" style="background-image: url('{product['image']}');">
+                        {f'<span style="position:absolute; top:10px; left:10px; background:red; color:white; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold;">{product["badge"]}</span>' if "badge" in product else ""}
                     </div>
-                    <div style="padding: 1rem; flex-grow: 1; display: flex; flex-direction: column;">
-                        <div style="font-size: 0.8rem; color: gray;">{product['category']}</div>
-                        <div style="font-weight: bold; color: #001f3f; margin-bottom: 0.5rem; line-height: 1.2; height: 2.4em; overflow: hidden;">{product['name']}</div>
-                        <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end;">
-                            <div style="display: flex; flex-direction: column;">
-                                {orig_price_html}
-                                <span class="price-text">S/. {product['price']:.2f}</span>
+                    <div style="padding: 15px; flex-grow: 1;">
+                        <div style="font-size: 12px; color: gray;">{product['category']}</div>
+                        <div style="font-weight: 700; color: #001f3f; margin-bottom: 5px; height: 40px; overflow: hidden; line-height: 1.2;">{product['name']}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px;">
+                            <div>
+                                {f'<div style="text-decoration: line-through; color: #ccc; font-size: 12px;">S/. {product["originalPrice"]:.2f}</div>' if product.get("originalPrice") else ""}
+                                <div style="color: #FF4500; font-weight: 800; font-size: 18px;">S/. {product['price']:.2f}</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Botón de acción (Nativo para que funcione el callback)
-                if st.button("Agregar 🛒", key=f"add_{product['id']}", use_container_width=True):
+                # 2. Parte Interactiva (Botón Streamlit)
+                # Ponemos el botón justo debajo
+                if st.button("Agregar 🛒", key=f"add_{product['id']}_{i}"):
                     add_to_cart(product)
+                
+                # Espacio para separar filas
+                st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
