@@ -1,10 +1,11 @@
 import streamlit as st
 from styles import get_css
 from state import init_state, get_cart_count, get_cart_total, navigate_to
+# Importamos las vistas (asegúrate de tener los archivos creados)
 from views.home import render_home
 from views.cart import render_cart
 from views.checkout import render_checkout
-from views.auth import render_login, render_register # Asumiendo que creas estos archivos similares
+from views.auth import render_login, render_register
 
 # Configuración inicial
 st.set_page_config(layout="wide", page_title="La Despensa de la Mascota", page_icon="🐾")
@@ -13,36 +14,49 @@ st.set_page_config(layout="wide", page_title="La Despensa de la Mascota", page_i
 init_state()
 st.markdown(get_css(), unsafe_allow_html=True)
 
-# --- HEADER PERSONALIZADO ---
-# Usamos un contenedor sticky simulado con CSS (.nav-container) y columnas de Streamlit dentro.
-st.markdown('<div class="nav-container">', unsafe_allow_html=True)
-col_logo, col_search, col_actions = st.columns([2, 3, 2])
+# --- HEADER FIEL AL ORIGINAL ---
+# Creamos un contenedor HTML visual para el fondo azul oscuro
+st.markdown("""
+<div class="nav-container">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 50%;">
+            <span style="font-size: 24px;">🐾</span>
+        </div>
+        <div style="line-height: 1.1;">
+            <div style="font-weight: bold; font-size: 18px;">La Despensa</div>
+            <div style="font-size: 12px; opacity: 0.8;">de la Mascota</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-with col_logo:
-    # Usamos markdown con html para el logo
-    if st.button("🐾 La Despensa", key="btn_logo"):
-        navigate_to('home')
+# Usamos columnas de Streamlit "flotando" visualmente en la posición correcta mediante margin negativo
+# para inyectar la funcionalidad interactiva (botones y búsqueda)
+col_spacer, col_search, col_actions = st.columns([2, 4, 3])
 
 with col_search:
+    # Barra de búsqueda
     st.text_input("search", placeholder="Buscar croquetas, juguetes...", label_visibility="collapsed")
 
 with col_actions:
-    # Mostramos resumen del carrito
-    count = get_cart_count()
-    total = get_cart_total()
-    label = f"🛒 {count} items | S/. {total:.2f}"
-    
-    c_login, c_cart = st.columns(2)
-    with c_login:
-        if st.button("👤 Ingresar"):
-            navigate_to('login')
+    c_user, c_cart = st.columns([1, 1])
+    with c_user:
+        if st.session_state.get('user_logged_in'):
+            st.button("👤 Mi Cuenta", key="btn_account")
+        else:
+            if st.button("👤 Ingresar", key="btn_login_nav"):
+                navigate_to('login')
     with c_cart:
-        if st.button(label):
+        count = get_cart_count()
+        total = get_cart_total()
+        # Botón de carrito con información dinámica
+        if st.button(f"🛒 S/. {total:.2f}", key="btn_cart_nav"):
             navigate_to('cart')
 
-st.markdown('</div>', unsafe_allow_html=True)
+# Separador invisible para bajar el contenido del header sticky
+st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
 
-# --- ROUTER DE VISTAS ---
+# --- ROUTER ---
 page = st.session_state.page
 
 if page == 'home':
@@ -52,38 +66,12 @@ elif page == 'cart':
 elif page == 'checkout':
     render_checkout()
 elif page == 'login':
-    # Implementación simple inline o importar de views/auth.py
-    st.markdown("### Iniciar Sesión")
-    st.text_input("Usuario")
-    st.text_input("Contraseña", type="password")
-    if st.button("Entrar"):
-        navigate_to('home')
+    render_login()
 elif page == 'register':
-    st.markdown("### Registro")
-    # Campos de registro...
-    if st.button("Crear Cuenta"):
-        navigate_to('home')
+    render_register()
+elif page == 'confirmation':
+    from views.checkout import render_confirmation # Si tienes esto separado
+    render_confirmation()
 
-# --- FOOTER ---
-st.markdown("""
-<div class="footer-sec">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
-        <div>
-            <h4>La Despensa de la Mascota</h4>
-            <p style="opacity: 0.7; font-size: 0.9rem;">Tu tienda de confianza con precios de barrio.</p>
-        </div>
-        <div>
-            <h4>Contacto</h4>
-            <p>📍 Av. Próceres de la Independencia 1234</p>
-            <p>📞 (01) 345-6789</p>
-        </div>
-        <div>
-            <h4>Encuéntranos</h4>
-            <p>Aceptamos Yape, Plin, Visa</p>
-        </div>
-    </div>
-    <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; font-size: 0.8rem; opacity: 0.6;">
-        © 2024 Tienda Buendía. Todos los derechos reservados.
-    </div>
-</div>
-""", unsafe_allow_html=True)
+# --- FOOTER (Opcional, simple) ---
+st.markdown("<br><br><div style='text-align:center; color:gray; font-size:12px;'>© 2024 Tienda Buendía</div>", unsafe_allow_html=True)
