@@ -1,133 +1,138 @@
 def get_css():
     return """
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
+        /* IMPORTAR FUENTES */
+        @import url('https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap');
         
+        /* --- RESET Y BASE --- */
         html, body, [class*="css"] {
             font-family: 'Spline Sans', sans-serif;
-            background-color: #f8f6f6; /* bg-background-light */
+            background-color: #F8F6F6; /* Color de fondo general */
             color: #181111;
         }
-        
-        /* Ocultar elementos nativos de Streamlit que rompen el diseño */
+
+        /* Ocultar elementos nativos molestos */
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         header {visibility: hidden;} 
         .block-container {
-            padding-top: 0rem;
-            padding-bottom: 0rem;
-            padding-left: 0rem;
-            padding-right: 0rem;
-            max-width: 100%;
+            padding-top: 0rem !important;
+            padding-bottom: 5rem !important;
+            padding-left: 0rem !important;
+            padding-right: 0rem !important;
+            max-width: 100% !important;
         }
 
-        /* --- CLASES PERSONALIZADAS TIPO TAILWIND --- */
-        
+        /* --- HEADER (NAVBAR) --- */
         .nav-container {
-            background-color: #001f3f; /* secondary-nav */
-            color: white;
-            padding: 1rem 2rem;
+            background-color: #001f3f;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             position: sticky;
             top: 0;
-            z-index: 999;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .hero-section {
-            background-image: linear-gradient(rgba(0, 31, 63, 0.4), rgba(0, 31, 63, 0.2)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGkOYn4A1tEQ3SppVa5eQHIcaxgAZMf9RJkkuKPi_bvVykVlCMuyubXd66sv_42V9Pwi7ABWyieP0D24ZOBxQp07cC5cxYhgsG04atJblcvb3WV532VV4l7QTv6dCmCtaqwwqBoQ6YQ0WhEQdvbewahVd4qxq4jzJoFcjUyrg08NQXd8I_Xr_z2BoMokoc2ULMHrFnrsq2XQFFlOtT8CBdcSSb8-dm8vEaqIjn8KKZZCCTB_t2zbbUVaRp3elNyMj8QNzMHG9XdKc');
-            background-size: cover;
-            background-position: center;
-            height: 500px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 5%;
+            z-index: 9999;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             color: white;
-            margin-bottom: 2rem;
-        }
-
-        .category-card {
-            background-color: white;
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            transition: transform 0.2s;
-            cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            height: 100%;
-        }
-        .category-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .product-card {
-            background-color: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: all 0.3s;
-            margin-bottom: 1rem;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        .product-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            transform: translateY(-4px);
-        }
-
-        .badge {
-            background-color: #ef4444; /* red-500 */
-            color: white;
-            font-size: 0.75rem;
-            font-weight: bold;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            position: absolute;
-            top: 0.5rem;
-            left: 0.5rem;
-            z-index: 10;
-        }
-
-        .price-text {
-            color: #FF4500; /* primary */
-            font-weight: 900;
-            font-size: 1.25rem;
+            margin-bottom: 20px;
         }
         
-        .btn-primary {
-            background-color: #FF4500 !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 9999px !important; /* rounded-full */
-            font-weight: bold !important;
-            padding: 0.5rem 1rem !important;
+        /* --- TARJETAS (LOGIN, REGISTRO, RESUMEN) --- */
+        .custom-card {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid #E5E7EB;
         }
-        
-        /* Estilizar botones de Streamlit para que parezcan los del diseño */
+
+        /* --- INPUTS --- */
+        /* Forzamos el estilo de los inputs de Streamlit */
+        .stTextInput > div > div > input {
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1px solid #E5E7EB;
+            background-color: #F9FAFB;
+            color: #111827;
+        }
+        .stTextInput > div > div > input:focus {
+            border-color: #FF4500;
+            box-shadow: 0 0 0 2px rgba(255, 69, 0, 0.2);
+        }
+
+        /* --- BOTONES --- */
+        /* Botón Primario (Naranja) */
         div.stButton > button {
-            background-color: white;
-            color: #001f3f;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
+            background-color: #FF4500;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 700;
             transition: all 0.2s;
+            width: 100%;
         }
         div.stButton > button:hover {
-            border-color: #FF4500;
-            color: #FF4500;
+            background-color: #CC3700;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
         }
         
-        /* Botones específicos 'Agregar' o 'Pagar' */
-        div.stButton > button:focus {
-            box-shadow: 0 0 0 2px rgba(255, 69, 0, 0.5);
+        /* Botón Secundario (Borde, para "Eliminar" o "Volver") */
+        div.stButton > button.secondary-btn {
+            background-color: transparent;
+            border: 2px solid #E5E7EB;
+            color: #374151;
+        }
+        
+        /* Botones Pequeños (+ / -) */
+        .small-btn > button {
+            padding: 5px 10px !important;
+            background-color: #F3F4F6 !important;
+            color: #1F2937 !important;
+            border-radius: 8px !important;
         }
 
-        .footer-sec {
-            background-color: #001f3f;
-            color: white;
-            padding: 4rem 2rem;
-            margin-top: 4rem;
+        /* --- PRODUCTOS --- */
+        .product-grid-item {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #F3F4F6;
+            transition: transform 0.2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
+        .product-grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+        .product-img {
+            width: 100%;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* --- CARRITO & CHECKOUT --- */
+        .cart-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #F3F4F6;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        /* Utility */
+        .text-primary { color: #FF4500; }
+        .text-navy { color: #001f3f; }
+        .font-bold { font-weight: 700; }
+        
     </style>
     """
