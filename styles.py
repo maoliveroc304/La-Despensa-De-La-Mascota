@@ -1,129 +1,138 @@
 def get_css():
     return """
     <style>
-        /* --- IMPORTAR FUENTES (Spline Sans) --- */
-        @import url('https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
+        /* --- 1. FUENTES Y COLORES DEL DISEÑO ORIGINAL --- */
+        @import url('https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
-        /* --- CONFIGURACIÓN BASE --- */
-        html, body, [class*="css"] {
-            font-family: 'Spline Sans', sans-serif;
-            background-color: #f8f6f6;
+        :root {
+            --primary: #FF4500;
+            --navy: #001f3f;
+            --bg-light: #f8f6f6;
         }
 
-        /* Ocultar elementos nativos de Streamlit */
+        html, body, [class*="css"] {
+            font-family: 'Spline Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: #181111;
+        }
+
+        /* Ocultar elementos nativos molestos */
         #MainMenu, footer, header {visibility: hidden;}
-        
-        /* Eliminar padding superior para pegar el header al techo */
         .block-container {
             padding-top: 0rem !important;
             padding-bottom: 5rem !important;
             max-width: 100% !important;
         }
 
-        /* --- FONDO DEL HEADER (Barra Azul) --- */
-        /* Imitamos la clase .bg-secondary-nav de Tailwind */
+        /* --- 2. HEADER EXACTO (Barra Azul) --- */
         .header-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 80px;
-            background-color: #001f3f;
+            height: 72px; /* Altura exacta del diseño Tailwind */
+            background-color: var(--navy);
             z-index: 990;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        /* --- POSICIONAMIENTO DE LOS WIDGETS --- */
-        /* Ajustamos el contenedor de Streamlit para que los widgets floten sobre la barra azul */
-        div[data-testid="stVerticalBlock"] > div:first-child {
-            z-index: 999;
-            position: sticky;
+        /* Contenedor flotante para los widgets de Python */
+        .header-widgets-container {
+            position: fixed;
             top: 0;
+            left: 0;
+            width: 100%;
+            height: 72px;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* --- LOGO (Botón Transparente) --- */
-        /* Convertimos el botón de Streamlit en el logo de texto */
+        /* --- 3. ESTILIZACIÓN DE WIDGETS DE PYTHON --- */
+
+        /* A) LOGO (Botón transparente) */
         .logo-btn button {
             background-color: transparent !important;
             color: white !important;
             border: none !important;
-            font-size: 20px !important;
+            font-size: 18px !important;
             font-weight: 700 !important;
-            text-align: left !important;
             padding: 0 !important;
-            margin-top: 10px !important;
+            margin-top: 5px !important;
         }
-        .logo-btn button:hover {
-            color: #FF4500 !important; /* Primary hover */
-        }
-        .logo-subtext {
-            color: rgba(255,255,255,0.9);
-            font-size: 12px;
-            font-weight: 300;
-            margin-top: -15px;
-            margin-left: 2px;
-            pointer-events: none; /* Para que el click pase al botón si se superpone */
-        }
+        .logo-btn button:hover { color: #ddd !important; }
 
-        /* --- BUSCADOR (Input Redondeado) --- */
-        /* Imitamos: rounded-full border-none focus:ring-2 focus:ring-primary text-sm bg-white */
-        .search-container div[data-testid="stTextInput"] > div > div > input {
+        /* B) BUSCADOR (Input Redondo + Icono Lupa) */
+        /* Hack: Ponemos una imagen de lupa de fondo en el input */
+        div[data-testid="stTextInput"] > div > div > input {
             border-radius: 9999px !important; /* rounded-full */
             border: none !important;
+            padding: 10px 10px 10px 40px !important; /* Espacio a la izq para el icono */
             background-color: white !important;
-            color: #4b5563 !important; /* text-gray-600 */
-            padding: 10px 20px !important;
-            margin-top: 5px;
-            box-shadow: 0 0 0 0 transparent !important; /* Quitar borde rojo default de streamlit */
+            color: #4b5563 !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%239CA3AF' class='w-6 h-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 10px center;
+            background-size: 20px;
+            height: 40px;
+            margin-top: -5px; /* Ajuste fino de alineación vertical */
         }
-        .search-container div[data-testid="stTextInput"] > div > div > input:focus {
-            box-shadow: 0 0 0 2px #FF4500 !important; /* focus:ring-primary */
-        }
-
-        /* --- BOTONES DE ACCIÓN (Derecha) --- */
-        .action-btn button {
+        
+        /* C) BOTONES DERECHA (Iconos transparentes) */
+        .nav-btn button {
             background-color: transparent !important;
             color: white !important;
-            border: none !important;
-            font-size: 14px !important;
+            border: 1px solid transparent !important;
             font-weight: 500 !important;
-            display: flex;
-            align-items: center;
-            padding: 0px 10px !important;
-            margin-top: 12px !important;
+            font-size: 14px !important;
         }
-        .action-btn button:hover {
-            color: #e5e7eb !important; /* hover:text-gray-200 */
+        .nav-btn button:hover {
+            background-color: rgba(255,255,255,0.1) !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            border-radius: 8px !important;
         }
-
-        /* Estilo para el Badge del Carrito */
+        
+        /* Badge rojo del carrito */
         .cart-badge {
-            background-color: #FF4500;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--primary);
             color: white;
-            border-radius: 9999px;
-            padding: 2px 6px;
             font-size: 10px;
             font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 40px; /* Ajustar posición según layout */
-            z-index: 1000;
-            border: 1px solid #001f3f;
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 1px solid var(--navy);
             pointer-events: none;
+            z-index: 1000;
         }
 
-        /* --- ESTILOS GENERALES DE LA APP --- */
-        .product-card {
+        /* --- 4. COMPONENTES GENERALES (Cards, Botones Naranjas) --- */
+        .card {
             background: white;
             border-radius: 12px;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: all 0.3s;
+            border: 1px solid #f3f4f6;
+            padding: 20px;
         }
-        .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        
+        /* Botón Primario (Naranja) - Reemplaza los botones por defecto */
+        div.stButton > button[kind="primary"] {
+            background-color: var(--primary) !important;
+            color: white !important;
+            border-radius: 12px !important;
+            border: none !important;
+            font-weight: bold !important;
+            padding: 10px 24px !important;
+            transition: transform 0.1s;
         }
+        div.stButton > button[kind="primary"]:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+        }
+
     </style>
     """
