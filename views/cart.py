@@ -1,71 +1,74 @@
 import streamlit as st
-from state import st, remove_from_cart, update_quantity, get_cart_total, navigate_to
+from state import update_quantity, remove_from_cart, get_cart_total, navigate_to
 
 def render_cart():
-    st.markdown("<h2 style='color:#001f3f; font-weight:bold; margin-bottom: 1.5rem;'>Carrito de Compras</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='text-navy' style='margin: 0 0 30px 0;'>Carrito de Compras</h2>", unsafe_allow_html=True)
     
     if not st.session_state.cart:
         st.info("Tu carrito está vacío.")
-        if st.button("Seguir comprando"):
+        if st.button("Volver a la tienda"):
             navigate_to('home')
         return
 
-    col_items, col_summary = st.columns([2, 1])
+    c_items, c_summary = st.columns([2.5, 1.2])
 
-    with col_items:
+    with c_items:
         for item in st.session_state.cart:
+            # Contenedor Visual de Fila
             with st.container():
-                c1, c2, c3 = st.columns([1, 2, 1])
-                with c1:
-                    st.markdown(f"""
-                    <div style="border-radius: 8px; overflow: hidden; height: 100px; width: 100px; background-image: url('{item['image']}'); background-size: cover;"></div>
-                    """, unsafe_allow_html=True)
-                with c2:
-                    st.markdown(f"<div style='font-weight: bold; color: #001f3f;'>{item['name']}</div>", unsafe_allow_html=True)
+                c_img, c_info, c_qty, c_price = st.columns([1, 2.5, 1.5, 1])
+                
+                with c_img:
+                    st.image(item['image'], use_container_width=True)
+                
+                with c_info:
+                    st.markdown(f"**{item['name']}**")
                     st.caption(item['category'])
-                    
-                    # Controles de cantidad
-                    cc1, cc2, cc3 = st.columns([1,1,2])
-                    with cc1:
-                        if st.button("−", key=f"dec_{item['id']}"):
-                            update_quantity(item['id'], -1)
-                    with cc2:
-                        st.markdown(f"<div style='text-align: center; font-weight: bold; padding-top: 5px;'>{item['quantity']}</div>", unsafe_allow_html=True)
-                    with cc3:
-                        if st.button("+", key=f"inc_{item['id']}"):
-                            update_quantity(item['id'], 1)
-                            
-                with c3:
-                    subtotal = item['price'] * item['quantity']
-                    st.markdown(f"<div style='text-align: right; color: #FF4500; font-weight: bold; font-size: 1.1rem;'>S/. {subtotal:.2f}</div>", unsafe_allow_html=True)
                     if st.button("Eliminar", key=f"del_{item['id']}"):
                         remove_from_cart(item['id'])
-                st.divider()
 
-    with col_summary:
-        st.markdown("""
-        <div style="background-color: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-            <h3 style="color: #001f3f; font-weight: bold; margin-bottom: 1rem;">Resumen</h3>
-        """, unsafe_allow_html=True)
+                with c_qty:
+                    # Controles de cantidad
+                    cq1, cq2, cq3 = st.columns([1, 1, 1])
+                    with cq1:
+                        # Usamos help para identificar, pero el estilo lo hace el CSS global de botones pequeños si es necesario
+                        if st.button("-", key=f"dec_{item['id']}"):
+                            update_quantity(item['id'], -1)
+                    with cq2:
+                        st.markdown(f"<div style='text-align:center; padding-top:10px; font-weight:bold;'>{item['quantity']}</div>", unsafe_allow_html=True)
+                    with cq3:
+                        if st.button("+", key=f"inc_{item['id']}"):
+                            update_quantity(item['id'], 1)
+
+                with c_price:
+                    total_item = item['price'] * item['quantity']
+                    st.markdown(f"<div style='color:#FF4500; font-weight:bold; text-align:right;'>S/. {total_item:.2f}</div>", unsafe_allow_html=True)
+                
+                st.markdown("<hr style='margin: 10px 0; border-color: #eee;'>", unsafe_allow_html=True)
+
+    with c_summary:
+        st.markdown('<div class="custom-card" style="padding: 20px;">', unsafe_allow_html=True)
+        st.markdown("<h3 class='text-navy'>Resumen</h3>", unsafe_allow_html=True)
         
         total = get_cart_total()
+        
         st.markdown(f"""
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                <span>Subtotal</span>
-                <span>S/. {total:.2f}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                <span>Envío</span>
-                <span style="font-size: 0.8rem; color: gray;">Calculado en el siguiente paso</span>
-            </div>
-            <div style="border-top: 1px dashed #ddd; margin: 1rem 0;"></div>
-            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem; color: #001f3f;">
-                <span>Total</span>
-                <span>S/. {total:.2f}</span>
-            </div>
-            <br>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span>Subtotal</span>
+            <span>S/. {total:.2f}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:gray; font-size:12px;">
+            <span>Envío</span>
+            <span>Calculado en checkout</span>
+        </div>
+        <hr>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px; color:#001f3f; margin-bottom:20px;">
+            <span>Total</span>
+            <span>S/. {total:.2f}</span>
         </div>
         """, unsafe_allow_html=True)
         
-        if st.button("Ir a Pagar ➔", type="primary", use_container_width=True):
+        if st.button("Ir a Pagar ➔", key="checkout_btn"):
             navigate_to('checkout')
+            
+        st.markdown('</div>', unsafe_allow_html=True)
